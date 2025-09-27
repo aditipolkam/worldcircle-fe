@@ -1,8 +1,9 @@
 'use client';
 
 import { TabItem, Tabs } from '@worldcoin/mini-apps-ui-kit-react';
-import { Bank, Home, User } from 'iconoir-react';
-import { useState } from 'react';
+import { Home, User, Plus, Circle } from 'iconoir-react';
+import { useRouter, usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 /**
  * This component uses the UI Kit to navigate between pages
@@ -12,13 +13,51 @@ import { useState } from 'react';
  */
 
 export const Navigation = () => {
-  const [value, setValue] = useState('home');
+  const router = useRouter();
+  const pathname = usePathname();
+  
+  // Map pathname to tab value
+  const getTabValue = (path: string) => {
+    if (path === '/') return 'home';
+    if (path === '/add-circle') return 'add-circle';
+    if (path === '/circles') return 'circles';
+    if (path === '/profile') return 'profile';
+    return 'home';
+  };
+
+  const [value, setValue] = useState(getTabValue(pathname));
+
+  // Update tab value when pathname changes
+  useEffect(() => {
+    setValue(getTabValue(pathname));
+  }, [pathname]);
+
+  const handleTabChange = (newValue: string) => {
+    setValue(newValue);
+    // Navigate to the corresponding page
+    switch (newValue) {
+      case 'home':
+        router.push('/');
+        break;
+      case 'add-circle':
+        router.push('/add-circle');
+        break;
+      case 'circles':
+        router.push('/circles');
+        break;
+      case 'profile':
+        router.push('/profile');
+        break;
+      default:
+        router.push('/');
+    }
+  };
 
   return (
-    <Tabs value={value} onValueChange={setValue}>
+    <Tabs value={value} onValueChange={handleTabChange}>
       <TabItem value="home" icon={<Home />} label="Home" />
-      {/* // TODO: These currently don't link anywhere */}
-      <TabItem value="wallet" icon={<Bank />} label="Wallet" />
+      <TabItem value="add-circle" icon={<Plus />} label="Add Circle" />
+      <TabItem value="circles" icon={<Circle />} label="World Circles" />
       <TabItem value="profile" icon={<User />} label="Profile" />
     </Tabs>
   );

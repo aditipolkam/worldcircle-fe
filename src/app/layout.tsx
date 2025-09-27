@@ -1,4 +1,6 @@
 import { auth } from '@/auth';
+import { Navigation } from '@/components/Navigation';
+import { Page } from '@/components/PageLayout';
 import ClientProviders from '@/providers';
 import '@worldcoin/mini-apps-ui-kit-react/styles.css';
 import type { Metadata } from 'next';
@@ -29,7 +31,14 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} `}>
-        <ClientProviders session={session}>{children}</ClientProviders>
+        <ClientProviders session={session}>
+          <Page>
+            {children}
+            <Page.Footer className="px-0 fixed bottom-0 w-full bg-white">
+              <Navigation />
+            </Page.Footer>
+          </Page>
+        </ClientProviders>
       </body>
     </html>
   );
