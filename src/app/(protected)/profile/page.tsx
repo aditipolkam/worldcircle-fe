@@ -1,8 +1,9 @@
 "use client";
 
 import { Page } from "@/components/PageLayout";
+import { useWorldTx } from "@/hooks/useWorldTx";
 import { TopBar, Marble } from "@worldcoin/mini-apps-ui-kit-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // Mock existing events data
 const existingEvents = [
@@ -14,6 +15,7 @@ const existingEvents = [
 ];
 
 export default function Profile() {
+  const { sendTx, status } = useWorldTx();
   const [isEditing, setIsEditing] = useState(false);
   const [showEventForm, setShowEventForm] = useState(false);
   const [profileData, setProfileData] = useState({
@@ -58,6 +60,19 @@ export default function Profile() {
       });
     }
   };
+
+  useEffect(() => {
+    async function registerPerson(
+      worldId: number,
+      name: string,
+      bio: string,
+      company: string
+    ) {
+      console.log("sending txn");
+      await sendTx("registerPerson", [worldId, name, bio, company]);
+    }
+    registerPerson(7, "aefef", "developer", "offline");
+  }, []);
 
   return (
     <>
