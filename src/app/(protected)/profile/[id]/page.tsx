@@ -1,10 +1,9 @@
 'use client';
 
-import { use } from 'react';
+import { use, useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Page } from '@/components/PageLayout';
 import { TopBar, Marble } from '@worldcoin/mini-apps-ui-kit-react';
-import { useState } from 'react';
 
 // Mock profile data for different people
 const getProfileData = (id: string) => {
@@ -12,7 +11,6 @@ const getProfileData = (id: string) => {
     '1': {
       id: '1',
       name: 'Alex Chen',
-      username: 'alexchen',
       gender: 'Male',
       age: '32',
       company: 'Google',
@@ -25,7 +23,6 @@ const getProfileData = (id: string) => {
     '2': {
       id: '2',
       name: 'Sarah Johnson',
-      username: 'sarahj',
       gender: 'Female',
       age: '28',
       company: 'Apple',
@@ -38,7 +35,6 @@ const getProfileData = (id: string) => {
     '3': {
       id: '3',
       name: 'Mike Rodriguez',
-      username: 'miker',
       gender: 'Male',
       age: '35',
       company: 'Microsoft',
@@ -51,7 +47,6 @@ const getProfileData = (id: string) => {
     '4': {
       id: '4',
       name: 'Emma Wilson',
-      username: 'emmaw',
       gender: 'Female',
       age: '26',
       company: 'Meta',
@@ -64,7 +59,6 @@ const getProfileData = (id: string) => {
     '5': {
       id: '5',
       name: 'David Kim',
-      username: 'davidk',
       gender: 'Male',
       age: '30',
       company: 'Netflix',
@@ -77,7 +71,6 @@ const getProfileData = (id: string) => {
     '6': {
       id: '6',
       name: 'Lisa Park',
-      username: 'lisap',
       gender: 'Female',
       age: '29',
       company: 'Tesla',
@@ -96,12 +89,49 @@ export default function IndividualProfile({ params }: { params: Promise<{ id: st
   const resolvedParams = use(params);
   const profile = getProfileData(resolvedParams.id);
   const [notes, setNotes] = useState('');
+  const [isSavingNotes, setIsSavingNotes] = useState(false);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+
+  const handleSaveNotes = async () => {
+    setIsSavingNotes(true);
+    setSaveStatus('saving');
+
+    try {
+      // Save notes to localStorage (in a real app, this would be an API call)
+      const userNotes = JSON.parse(localStorage.getItem('userNotes') || '{}');
+      userNotes[profile.id] = notes;
+      localStorage.setItem('userNotes', JSON.stringify(userNotes));
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      setSaveStatus('saved');
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setSaveStatus('idle'), 3000);
+      
+    } catch (error) {
+      console.error('Error saving notes:', error);
+      setSaveStatus('error');
+      setTimeout(() => setSaveStatus('idle'), 3000);
+    } finally {
+      setIsSavingNotes(false);
+    }
+  };
+
+  // Load existing notes on component mount
+  useEffect(() => {
+    const userNotes = JSON.parse(localStorage.getItem('userNotes') || '{}');
+    if (userNotes[profile.id]) {
+      setNotes(userNotes[profile.id]);
+    }
+  }, [profile.id]);
 
   return (
     <>
       <Page.Header className="p-0">
         <TopBar 
-          title="Profile"
+          title={profile.name}
           startAdornment={
             <Link href="/" className="text-blue-600 font-medium text-sm">
               ← Back
@@ -129,7 +159,6 @@ export default function IndividualProfile({ params }: { params: Promise<{ id: st
               </div>
             </div>
             <h2 className="text-xl font-semibold mb-1">{profile.name}</h2>
-            <p className="text-gray-600 text-sm">@{profile.username}</p>
             <p className="text-gray-500 text-sm">{profile.location}</p>
           </div>
 
@@ -191,15 +220,25 @@ export default function IndividualProfile({ params }: { params: Promise<{ id: st
                 {notes.length} characters
               </span>
               <button
-                onClick={() => {
-                  // TODO: Save notes to API
-                  alert('Notes saved!');
-                }}
-                className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                onClick={handleSaveNotes}
+                disabled={isSavingNotes}
+                className={`text-sm font-medium ${
+                  isSavingNotes
+                    ? 'text-gray-400 cursor-not-allowed'
+                    : 'text-blue-600 hover:text-blue-700'
+                }`}
               >
-                Save Notes
+                {isSavingNotes ? 'Saving...' : 'Save Notes'}
               </button>
             </div>
+            
+            {/* Status Messages */}
+            {saveStatus === 'saved' && (
+              <p className="text-green-600 text-sm mt-2 text-center">✅ Notes saved!</p>
+            )}
+            {saveStatus === 'error' && (
+              <p className="text-red-600 text-sm mt-2 text-center">❌ Failed to save notes.</p>
+            )}
           </div>
 
           {/* Action Buttons */}
