@@ -1,8 +1,9 @@
-'use client';
-import { walletAuth } from '@/auth/wallet';
-import { Button, LiveFeedback } from '@worldcoin/mini-apps-ui-kit-react';
-import { useMiniKit } from '@worldcoin/minikit-js/minikit-provider';
-import { useCallback, useEffect, useState } from 'react';
+"use client";
+import { walletAuth } from "@/auth/wallet";
+import { Button, LiveFeedback } from "@worldcoin/mini-apps-ui-kit-react";
+import { useMiniKit } from "@worldcoin/minikit-js/minikit-provider";
+import { signOut, useSession } from "next-auth/react";
+import { useCallback, useState } from "react";
 
 /**
  * This component is an example of how to authenticate a user
@@ -12,6 +13,7 @@ import { useCallback, useEffect, useState } from 'react';
 export const AuthButton = () => {
   const [isPending, setIsPending] = useState(false);
   const { isInstalled } = useMiniKit();
+  const { data: session, status } = useSession();
 
   const onClick = useCallback(async () => {
     if (!isInstalled || isPending) {
@@ -21,7 +23,7 @@ export const AuthButton = () => {
     try {
       await walletAuth();
     } catch (error) {
-      console.error('Wallet authentication button error', error);
+      console.error("Wallet authentication button error", error);
       setIsPending(false);
       return;
     }
@@ -29,40 +31,65 @@ export const AuthButton = () => {
     setIsPending(false);
   }, [isInstalled, isPending]);
 
-  useEffect(() => {
-    const authenticate = async () => {
-      if (isInstalled && !isPending) {
-        setIsPending(true);
-        try {
-          await walletAuth();
-        } catch (error) {
-          console.error('Auto wallet authentication error', error);
-        } finally {
-          setIsPending(false);
-        }
-      }
-    };
+  // Show loading state while session is being loaded
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center">
+        <div>Loading session...</div>
+      </div>
+    );
+  }
 
-    authenticate();
-  }, [isInstalled, isPending]);
+  // If user is authenticated, show welcome message instead of login button
+  if (session?.user) {
+    return (
+      <div className="text-center space-y-4">
+        <div className="text-lg font-semibold">Welcome back!</div>
+        <div className="text-sm text-gray-600">
+          Wallet: {session.user.walletAddress}
+        </div>
+        <div className="text-sm text-gray-600">
+          Username: {session.user.username}
+        </div>
+        <Button
+          onClick={() => {
+            signOut();
+          }}
+          size="lg"
+          variant="secondary"
+        >
+          Sign Out
+        </Button>
+      </div>
+    );
+  }
 
+  // Show login button for unauthenticated users
   return (
-    <LiveFeedback
-      label={{
-        failed: 'Failed to login',
-        pending: 'Logging in',
-        success: 'Logged in',
-      }}
-      state={isPending ? 'pending' : undefined}
-    >
-      <Button
-        onClick={onClick}
-        disabled={isPending}
-        size="lg"
-        variant="primary"
+    <>
+      <LiveFeedback
+        label={{
+          failed: "Failed to login",
+          pending: "Logging in",
+          success: "Logged in",
+        }}
+        state={isPending ? "pending" : undefined}
       >
-        Login with Wallet
-      </Button>
-    </LiveFeedback>
+        <Button
+          onClick={onClick}
+          disabled={isPending}
+          size="lg"
+          variant="primary"
+        >
+          Login with Wallet
+        </Button>
+      </LiveFeedback>
+      {/* Remove debug session display in production */}
+      {process.env.NODE_ENV === "development" && (
+        <div className="mt-4 text-xs text-gray-500">
+          Session Status: {status}
+        </div>
+      )}
+    </>
   );
 };

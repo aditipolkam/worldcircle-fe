@@ -32,7 +32,8 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} `}>
         <ClientProviders session={session}>
-          <Page>
+          {/* <div>{JSON.stringify(session)}</div> */}
+          <Page className="bg-grey-100">
             {children}
             <Page.Footer className="px-0 fixed bottom-0 w-full bg-white">
               <Navigation />

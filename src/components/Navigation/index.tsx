@@ -18,7 +18,7 @@ export const Navigation = () => {
 
   // Map pathname to tab value
   const getTabValue = (path: string) => {
-    if (path === "/") return "home";
+    if (path === "/home") return "home";
     if (path === "/qr") return "qr";
     if (path === "/circles") return "circles";
     if (path === "/profile") return "profile";
@@ -37,7 +37,7 @@ export const Navigation = () => {
     // Navigate to the corresponding page
     switch (newValue) {
       case "home":
-        router.push("/");
+        router.push("/home");
         break;
       case "qr":
         router.push("/qr");
@@ -54,7 +54,7 @@ export const Navigation = () => {
   };
 
   return (
-    <Tabs value={value} onValueChange={handleTabChange}>
+    <Tabs value={value} onValueChange={handleTabChange} unselectable="off">
       <TabItem value="home" icon={<Home />} label="Home" />
       <TabItem value="qr" icon={<Plus />} label="Add Circle" />
       <TabItem value="circles" icon={<Circle />} label="World Circles" />

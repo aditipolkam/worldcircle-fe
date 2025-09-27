@@ -1,9 +1,9 @@
 "use client";
 
+import { WorldCircle, client } from "@/lib/contract";
 import { MiniKit } from "@worldcoin/minikit-js";
 import { useWaitForTransactionReceipt } from "@worldcoin/minikit-react";
-import { useState, useEffect } from "react";
-import { WorldCircle, client } from "@/lib/contract";
+import { useEffect, useState } from "react";
 
 export function useWorldTx() {
   const [txId, setTxId] = useState<string>("");
