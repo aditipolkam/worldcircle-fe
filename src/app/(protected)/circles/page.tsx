@@ -1,123 +1,131 @@
-'use client';
+"use client";
 
-import { use } from 'react';
-import Link from 'next/link';
-import { Page } from '@/components/PageLayout';
-import { TopBar } from '@worldcoin/mini-apps-ui-kit-react';
+import Link from "next/link";
+import { Page } from "@/components/PageLayout";
+import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 
 // Mock location data with profiles
 const locationData = [
   {
-    id: 'sf',
-    name: 'San Francisco',
-    country: 'USA',
+    id: "sf",
+    name: "San Francisco",
+    country: "USA",
     coordinates: { x: 15, y: 35 },
     profiles: [
       {
-        id: '1',
-        name: 'Alex Chen',
-        username: 'alexchen',
-        profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-        isOnline: true
+        id: "1",
+        name: "Alex Chen",
+        username: "alexchen",
+        profilePicture:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+        isOnline: true,
       },
       {
-        id: '2',
-        name: 'Sarah Johnson',
-        username: 'sarahj',
-        profilePicture: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
-        isOnline: false
-      }
-    ]
+        id: "2",
+        name: "Sarah Johnson",
+        username: "sarahj",
+        profilePicture:
+          "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        isOnline: false,
+      },
+    ],
   },
   {
-    id: 'ny',
-    name: 'New York',
-    country: 'USA',
+    id: "ny",
+    name: "New York",
+    country: "USA",
     coordinates: { x: 25, y: 30 },
     profiles: [
       {
-        id: '3',
-        name: 'Mike Rodriguez',
-        username: 'miker',
-        profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-        isOnline: true
+        id: "3",
+        name: "Mike Rodriguez",
+        username: "miker",
+        profilePicture:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+        isOnline: true,
       },
       {
-        id: '4',
-        name: 'Emma Wilson',
-        username: 'emmaw',
-        profilePicture: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face',
-        isOnline: true
-      }
-    ]
+        id: "4",
+        name: "Emma Wilson",
+        username: "emmaw",
+        profilePicture:
+          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
+        isOnline: true,
+      },
+    ],
   },
   {
-    id: 'london',
-    name: 'London',
-    country: 'UK',
+    id: "london",
+    name: "London",
+    country: "UK",
     coordinates: { x: 50, y: 25 },
     profiles: [
       {
-        id: '5',
-        name: 'David Kim',
-        username: 'davidk',
-        profilePicture: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face',
-        isOnline: false
-      }
-    ]
+        id: "5",
+        name: "David Kim",
+        username: "davidk",
+        profilePicture:
+          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
+        isOnline: false,
+      },
+    ],
   },
   {
-    id: 'tokyo',
-    name: 'Tokyo',
-    country: 'Japan',
+    id: "tokyo",
+    name: "Tokyo",
+    country: "Japan",
     coordinates: { x: 80, y: 30 },
     profiles: [
       {
-        id: '6',
-        name: 'Lisa Park',
-        username: 'lisap',
-        profilePicture: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face',
-        isOnline: true
+        id: "6",
+        name: "Lisa Park",
+        username: "lisap",
+        profilePicture:
+          "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
+        isOnline: true,
       },
       {
-        id: '7',
-        name: 'Hiroshi Tanaka',
-        username: 'hiroshi',
-        profilePicture: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face',
-        isOnline: true
-      }
-    ]
+        id: "7",
+        name: "Hiroshi Tanaka",
+        username: "hiroshi",
+        profilePicture:
+          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
+        isOnline: true,
+      },
+    ],
   },
   {
-    id: 'sydney',
-    name: 'Sydney',
-    country: 'Australia',
+    id: "sydney",
+    name: "Sydney",
+    country: "Australia",
     coordinates: { x: 85, y: 70 },
     profiles: [
       {
-        id: '8',
-        name: 'Olivia Brown',
-        username: 'oliviab',
-        profilePicture: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face',
-        isOnline: false
-      }
-    ]
+        id: "8",
+        name: "Olivia Brown",
+        username: "oliviab",
+        profilePicture:
+          "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
+        isOnline: false,
+      },
+    ],
   },
   {
-    id: 'berlin',
-    name: 'Berlin',
-    country: 'Germany',
+    id: "berlin",
+    name: "Berlin",
+    country: "Germany",
     coordinates: { x: 52, y: 28 },
     profiles: [
       {
-        id: '9',
-        name: 'Max Mueller',
-        username: 'maxm',
-        profilePicture: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face',
-        isOnline: true
-      }
-    ]
-  }
+        id: "9",
+        name: "Max Mueller",
+        username: "maxm",
+        profilePicture:
+          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
+        isOnline: true,
+      },
+    ],
+  },
 ];
 
 export default function WorldCircles() {
@@ -126,13 +134,15 @@ export default function WorldCircles() {
       <Page.Header className="p-0">
         <TopBar title="World Circles" />
       </Page.Header>
-      
+
       <Page.Main className="mb-16">
         <div className="px-4 py-6">
           {/* Header */}
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold mb-2">Explore World Circles</h1>
-            <p className="text-gray-600">Connect with people around the globe</p>
+            <p className="text-gray-600">
+              Connect with people around the globe
+            </p>
           </div>
 
           {/* Globe Container */}
@@ -155,7 +165,7 @@ export default function WorldCircles() {
                   style={{
                     left: `${location.coordinates.x}%`,
                     top: `${location.coordinates.y}%`,
-                    transform: 'translate(-50%, -50%)'
+                    transform: "translate(-50%, -50%)",
                   }}
                 >
                   {/* Profile Pictures Circle */}
@@ -168,7 +178,7 @@ export default function WorldCircles() {
                           alt={location.profiles[0]?.name}
                           className="w-full h-full object-cover"
                         />
-                        
+
                         {/* Additional Profile Pictures Overlay */}
                         {location.profiles.length > 1 && (
                           <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue-500 rounded-full border-2 border-white overflow-hidden">
@@ -179,7 +189,7 @@ export default function WorldCircles() {
                             />
                           </div>
                         )}
-                        
+
                         {/* More Profiles Indicator */}
                         {location.profiles.length > 2 && (
                           <div className="absolute -top-1 -left-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white flex items-center justify-center">
@@ -190,7 +200,7 @@ export default function WorldCircles() {
                         )}
                       </div>
                     </div>
-                    
+
                     {/* Online Indicator */}
                     <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white">
                       <div className="w-full h-full bg-green-400 rounded-full animate-pulse"></div>
@@ -204,21 +214,34 @@ export default function WorldCircles() {
 
                   {/* Profile Preview on Hover */}
                   <div className="absolute top-16 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg p-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200 min-w-48 z-10">
-                    <h4 className="font-semibold text-sm mb-2">{location.name}</h4>
+                    <h4 className="font-semibold text-sm mb-2">
+                      {location.name}
+                    </h4>
                     <div className="space-y-2">
                       {location.profiles.slice(0, 3).map((profile) => (
-                        <div key={profile.id} className="flex items-center gap-2">
+                        <div
+                          key={profile.id}
+                          className="flex items-center gap-2"
+                        >
                           <img
                             src={profile.profilePicture}
                             alt={profile.name}
                             className="w-6 h-6 rounded-full object-cover"
                           />
-                          <span className="text-xs font-medium">{profile.name}</span>
-                          <div className={`w-2 h-2 rounded-full ${profile.isOnline ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                          <span className="text-xs font-medium">
+                            {profile.name}
+                          </span>
+                          <div
+                            className={`w-2 h-2 rounded-full ${
+                              profile.isOnline ? "bg-green-500" : "bg-gray-400"
+                            }`}
+                          ></div>
                         </div>
                       ))}
                       {location.profiles.length > 3 && (
-                        <p className="text-xs text-gray-500">+{location.profiles.length - 3} more</p>
+                        <p className="text-xs text-gray-500">
+                          +{location.profiles.length - 3} more
+                        </p>
                       )}
                     </div>
                   </div>
@@ -233,7 +256,7 @@ export default function WorldCircles() {
             {locationData.map((location) => (
               <Link
                 key={location.id}
-                href={`/profile/${location.profiles[0]?.id || '1'}`} // Link to first profile in location
+                href={`/profile/${location.profiles[0]?.id || "1"}`} // Link to first profile in location
                 className="block bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center justify-between">
@@ -245,7 +268,9 @@ export default function WorldCircles() {
                     </div>
                     <div>
                       <h3 className="font-semibold">{location.name}</h3>
-                      <p className="text-sm text-gray-600">{location.country}</p>
+                      <p className="text-sm text-gray-600">
+                        {location.country}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">

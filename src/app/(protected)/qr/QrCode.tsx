@@ -126,7 +126,14 @@ export default function QrCode({ worldId }: { worldId: string }) {
                   <div className="absolute inset-2 border-2 border-gradient-to-r from-blue-500 to-purple-500 rounded-2xl"></div>
 
                   {/* QR Code */}
-                  <QRCodeSVG value={worldId} size={200} />
+                  <QRCodeSVG
+                    value={
+                      process.env.NEXT_PUBLIC_AUTH_URL +
+                      "/share?worldId=" +
+                      worldId
+                    }
+                    size={200}
+                  />
 
                   {/* Corner decorations */}
                   <div className="absolute top-4 left-4 w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full opacity-60"></div>
