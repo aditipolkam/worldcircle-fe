@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Page } from '@/components/PageLayout';
 import { TopBar, Marble } from '@worldcoin/mini-apps-ui-kit-react';
-import { auth } from '@/auth';
+import { useWorldTx } from '@/hooks/useWorldTx';
 
 interface ProfileData {
   name: string;
