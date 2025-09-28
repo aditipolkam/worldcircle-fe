@@ -52,7 +52,6 @@ export default function SelfAuthButton() {
     }).build();
 
     setSelfApp(app);
-    //@ts-expect-error lib error no update
     setUniversalLink(getUniversalLink(app));
   }, [session.data?.user, userId]);
 
