@@ -85,7 +85,7 @@ const AVAILABLE_LOCATIONS = [
 ];
 
 // Function to assign location based on worldId (deterministic)
-const assignLocationToConnection = (connection: Connection, index: number) => {
+const assignLocationToConnection = (connection: Connection) => {
   // Use worldId hash to deterministically assign location
   const hash = connection.worldId.split("").reduce((a, b) => {
     a = (a << 5) - a + b.charCodeAt(0);
@@ -101,8 +101,8 @@ const transformConnectionsToLocations = (
 ): LocationData[] => {
   const locationMap = new Map<string, LocationData>();
 
-  connections.forEach((connection, index) => {
-    const assignedLocation = assignLocationToConnection(connection, index);
+  connections.forEach((connection) => {
+    const assignedLocation = assignLocationToConnection(connection);
 
     const profile: Profile = {
       id: connection.id,
