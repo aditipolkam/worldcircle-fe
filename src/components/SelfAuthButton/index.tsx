@@ -28,7 +28,7 @@ export default function SelfAuthButton() {
       deeplinkCallback: `worldapp://mini-app?app_id=${
         process.env.NEXT_PUBLIC_APP_ID
       }&path=${encodeURI("/home")}`,
-      userDefinedData: "testsetestsetset",
+      userDefinedData: "Verifying Identity with zkproof and self.xyz!",
       disclosures: {
         // What you want to verify from the user's identity
         minimumAge: 18,
@@ -52,8 +52,9 @@ export default function SelfAuthButton() {
     }).build();
 
     setSelfApp(app);
+    //@ts-expect-error lib error no update
     setUniversalLink(getUniversalLink(app));
-  }, [userId]);
+  }, [session.data?.user, userId]);
 
   const openSelfApp = () => {
     if (!universalLink) return;

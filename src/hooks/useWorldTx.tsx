@@ -26,7 +26,7 @@ export function useWorldTx() {
     else if (isLoading) setStatus("pending");
   }, [isLoading, isSuccess, isError, txId]);
 
-  async function sendTx(fn: string, args: any[] = []) {
+  async function sendTx(fn: string, args: unknown[] = []) {
     setStatus("pending");
     try {
       const { finalPayload } = await MiniKit.commandsAsync.sendTransaction({

@@ -2,9 +2,9 @@
 
 import { Page } from "@/components/PageLayout";
 import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
-import { useSearchParams } from "next/navigation.js";
-import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { useSearchParams } from "next/navigation.js";
+import { useState } from "react";
 
 const QrReader = dynamic(
   () => import("react-qr-reader").then((mod) => mod.QrReader), // <-- use named export
@@ -13,49 +13,10 @@ const QrReader = dynamic(
 
 export default function AddCircle() {
   const [showQR, setShowQR] = useState(false);
-  const [receivedId, setReceivedId] = useState<string | null>(null);
-  const [nfcSupported, setNfcSupported] = useState(false);
+  const [_, setReceivedId] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const worldId = searchParams.get("worldId");
   const worldAddress = searchParams.get("worldAddress");
-
-  useEffect(() => {
-    if ("NDEFReader" in window) {
-      setNfcSupported(true);
-    }
-  }, []);
-
-  const writeNFC = async () => {
-    if (!("NDEFReader" in window)) return;
-    try {
-      const ndef = new (window as any).NDEFReader();
-      await ndef.write({ records: [{ recordType: "text", data: worldId }] });
-      alert("WorldID sent via NFC!");
-    } catch (err) {
-      console.error("NFC write failed", err);
-      alert("NFC write failed");
-    }
-  };
-
-  const readNFC = async () => {
-    if (!("NDEFReader" in window)) return;
-    try {
-      const ndef = new (window as any).NDEFReader();
-      await ndef.scan();
-      ndef.onreading = (event: any) => {
-        for (const record of event.message.records) {
-          if (record.recordType === "text") {
-            const textDecoder = new TextDecoder(record.encoding || "utf-8");
-            setReceivedId(textDecoder.decode(record.data));
-          }
-        }
-      };
-      alert("Ready to scan NFC!");
-    } catch (err) {
-      console.error("NFC scan failed", err);
-      alert("NFC scan failed");
-    }
-  };
 
   if (!worldId) {
     return <></>;

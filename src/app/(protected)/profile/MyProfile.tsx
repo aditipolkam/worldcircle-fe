@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { Page } from "@/components/PageLayout";
-import { TopBar, Marble } from "@worldcoin/mini-apps-ui-kit-react";
 import { useWorldTx } from "@/hooks/useWorldTx";
-import { Session } from "next-auth";
 import { getPerson } from "@/lib/read";
+import { Marble, TopBar } from "@worldcoin/mini-apps-ui-kit-react";
+import { Session } from "next-auth";
+import { useEffect, useState } from "react";
 
 interface ProfileData {
   name: string;
@@ -31,7 +31,7 @@ const availableEvents = [
 ];
 
 export default function MyProfile({ session }: { session: Session }) {
-  const { sendTx, status } = useWorldTx();
+  const { sendTx } = useWorldTx();
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<
@@ -56,8 +56,9 @@ export default function MyProfile({ session }: { session: Session }) {
       try {
         // Try to load from localStorage first
         // const savedProfile = localStorage.getItem("userProfile");
-        const [worldId, name, bio, location, company, isSelfVerified] =
-          await getPerson(session.user.walletAddress as `0x${string}`);
+        const [name, bio, location, company] = await getPerson(
+          session.user.walletAddress as `0x${string}`
+        );
 
         setProfileData({ ...profileData, name, bio, company, location });
       } catch (error) {
@@ -66,7 +67,7 @@ export default function MyProfile({ session }: { session: Session }) {
     };
 
     loadProfile();
-  }, []);
+  }, [profileData, session.user.walletAddress]);
 
   const handleSaveProfile = async () => {
     if (!session?.user.id) return;
@@ -285,7 +286,7 @@ export default function MyProfile({ session }: { session: Session }) {
             {isEditing ? (
               <div className="space-y-3">
                 <p className="text-sm text-gray-600">
-                  Select events you've attended:
+                  Select events you&lsquo;ve attended:
                 </p>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
                   {availableEvents.map((event) => (
