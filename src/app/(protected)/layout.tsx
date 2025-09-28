@@ -6,7 +6,6 @@ export default async function TabsLayout({
   children: React.ReactNode;
 }) {
   const session = await auth();
-  console.log(session);
   // If the user is not authenticated, redirect to the login page
   if (!session) {
     console.log("Not authenticated");
