@@ -4,6 +4,8 @@ import { Page } from "@/components/PageLayout";
 import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 import { useSearchParams } from "next/navigation.js";
 import { useState } from "react";
+import { Connection } from "@/types/connection";
+import { saveConnection } from "@/utils/localStorage";
 
 export default function AddCircle() {
   const [notes, setNotes] = useState("");
@@ -12,34 +14,49 @@ export default function AddCircle() {
     "idle" | "success" | "error"
   >("idle");
   const searchParams = useSearchParams();
-  
+
   // Get parameters from URL - try multiple possible parameter names
-  const worldId = searchParams.get("worldId") || searchParams.get("id") || searchParams.get("userId");
-  const worldAddress = searchParams.get("worldAddress") || searchParams.get("address") || searchParams.get("userAddress");
-  
+  const worldId =
+    searchParams.get("worldId") ||
+    searchParams.get("id") ||
+    searchParams.get("userId");
+  const worldAddress =
+    searchParams.get("worldAddress") ||
+    searchParams.get("address") ||
+    searchParams.get("userAddress");
+
   // Debug: Log all URL parameters
-  console.log("All URL parameters:", Object.fromEntries(searchParams.entries()));
+  console.log(
+    "All URL parameters:",
+    Object.fromEntries(searchParams.entries())
+  );
   console.log("Extracted worldId:", worldId);
   console.log("Extracted worldAddress:", worldAddress);
 
-  // Dummy smart contract call function
+  // Save connection to localStorage
   const handleSubmit = async () => {
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
     try {
-      // Simulate smart contract call
-      console.log("Calling smart contract with:", {
-        worldId,
-        worldAddress,
+      // Create new connection
+      const newConnection: Connection = {
+        id: Date.now().toString(),
+        worldId: worldId || "",
+        worldAddress: worldAddress || "",
         notes,
-        action: "addConnection",
-      });
+        createdAt: new Date().toISOString(),
+        connectedBy: "current-user", // In a real app, this would be the current user's identifier
+      };
 
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      // Save connection using utility function
+      saveConnection(newConnection);
 
-      // Simulate success
+      console.log("Connection saved:", newConnection);
+
+      // Simulate API delay for better UX
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       setSubmitStatus("success");
 
       // Clear form after success
@@ -48,7 +65,7 @@ export default function AddCircle() {
         setSubmitStatus("idle");
       }, 3000);
     } catch (error) {
-      console.error("Smart contract call failed:", error);
+      console.error("Failed to save connection:", error);
       setSubmitStatus("error");
 
       // Reset error status after 3 seconds
@@ -94,10 +111,12 @@ export default function AddCircle() {
             <h2 className="text-xl font-semibold text-green-800 mb-2">
               Successfully Connected!
             </h2>
-              <p className="text-green-700 text-sm">
-                You're successfully connected with World ID:{" "}
-                <span className="font-mono font-semibold">{worldId || "Unknown"}</span>
-              </p>
+            <p className="text-green-700 text-sm">
+              You&apos;re successfully connected with World ID:{" "}
+              <span className="font-mono font-semibold">
+                {worldId || "Unknown"}
+              </span>
+            </p>
             <p className="text-green-600 text-xs mt-2">
               Address: {worldAddress || "Not provided"}
             </p>
@@ -154,7 +173,8 @@ export default function AddCircle() {
                   />
                 </svg>
                 <p className="text-green-600 text-sm">
-                  ✅ Connection successfully added to blockchain! Notes saved.
+                  ✅ Connection successfully saved! Notes added to your
+                  contacts.
                 </p>
               </div>
             </div>
@@ -185,11 +205,16 @@ export default function AddCircle() {
 
           {/* Debug Info - Remove this in production */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-gray-800 mb-2">Debug Info</h3>
+            <h3 className="text-sm font-medium text-gray-800 mb-2">
+              Debug Info
+            </h3>
             <div className="text-xs text-gray-600 space-y-1">
               <p>World ID: {worldId || "Not found"}</p>
               <p>Address: {worldAddress || "Not found"}</p>
-              <p>All URL params: {JSON.stringify(Object.fromEntries(searchParams.entries()))}</p>
+              <p>
+                All URL params:{" "}
+                {JSON.stringify(Object.fromEntries(searchParams.entries()))}
+              </p>
             </div>
           </div>
 
@@ -214,8 +239,8 @@ export default function AddCircle() {
                   Connection Details
                 </h3>
                 <ul className="text-sm text-blue-700 mt-1 space-y-1">
-                  <li>• This connection is stored on the blockchain</li>
-                  <li>• Your notes are saved locally for your reference</li>
+                  <li>• This connection is saved locally for demo purposes</li>
+                  <li>• Your notes are stored with the connection</li>
                   <li>• You can view this connection in your profile</li>
                 </ul>
               </div>
