@@ -12,8 +12,15 @@ export default function AddCircle() {
     "idle" | "success" | "error"
   >("idle");
   const searchParams = useSearchParams();
-  const worldId = searchParams.get("worldId");
-  const worldAddress = searchParams.get("worldAddress");
+  
+  // Get parameters from URL - try multiple possible parameter names
+  const worldId = searchParams.get("worldId") || searchParams.get("id") || searchParams.get("userId");
+  const worldAddress = searchParams.get("worldAddress") || searchParams.get("address") || searchParams.get("userAddress");
+  
+  // Debug: Log all URL parameters
+  console.log("All URL parameters:", Object.fromEntries(searchParams.entries()));
+  console.log("Extracted worldId:", worldId);
+  console.log("Extracted worldAddress:", worldAddress);
 
   // Dummy smart contract call function
   const handleSubmit = async () => {
@@ -87,12 +94,12 @@ export default function AddCircle() {
             <h2 className="text-xl font-semibold text-green-800 mb-2">
               Successfully Connected!
             </h2>
-            <p className="text-green-700 text-sm">
-              You're successfully connected with World ID:{" "}
-              <span className="font-mono font-semibold">{worldId}</span>
-            </p>
+              <p className="text-green-700 text-sm">
+                You're successfully connected with World ID:{" "}
+                <span className="font-mono font-semibold">{worldId || "Unknown"}</span>
+              </p>
             <p className="text-green-600 text-xs mt-2">
-              Address: {worldAddress}
+              Address: {worldAddress || "Not provided"}
             </p>
           </div>
 
@@ -175,6 +182,16 @@ export default function AddCircle() {
               </div>
             </div>
           )}
+
+          {/* Debug Info - Remove this in production */}
+          <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-gray-800 mb-2">Debug Info</h3>
+            <div className="text-xs text-gray-600 space-y-1">
+              <p>World ID: {worldId || "Not found"}</p>
+              <p>Address: {worldAddress || "Not found"}</p>
+              <p>All URL params: {JSON.stringify(Object.fromEntries(searchParams.entries()))}</p>
+            </div>
+          </div>
 
           {/* Additional Info */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
