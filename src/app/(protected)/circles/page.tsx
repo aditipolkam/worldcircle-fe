@@ -1,134 +1,126 @@
 "use client";
 
-import Link from "next/link";
 import { Page } from "@/components/PageLayout";
 import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
+import { useEffect, useState } from "react";
+import { Connection } from "@/types/connection";
+import { getConnections } from "@/utils/localStorage";
 
-// Mock location data with profiles
-const locationData = [
-  {
-    id: "sf",
-    name: "San Francisco",
-    country: "USA",
-    coordinates: { x: 15, y: 35 },
-    profiles: [
-      {
-        id: "1",
-        name: "Alex Chen",
-        username: "alexchen",
-        profilePicture:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-        isOnline: true,
-      },
-      {
-        id: "2",
-        name: "Sarah Johnson",
-        username: "sarahj",
-        profilePicture:
-          "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-        isOnline: false,
-      },
-    ],
-  },
-  {
-    id: "ny",
-    name: "New York",
-    country: "USA",
-    coordinates: { x: 25, y: 30 },
-    profiles: [
-      {
-        id: "3",
-        name: "Mike Rodriguez",
-        username: "miker",
-        profilePicture:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-        isOnline: true,
-      },
-      {
-        id: "4",
-        name: "Emma Wilson",
-        username: "emmaw",
-        profilePicture:
-          "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&crop=face",
-        isOnline: true,
-      },
-    ],
-  },
-  {
-    id: "london",
-    name: "London",
-    country: "UK",
-    coordinates: { x: 50, y: 25 },
-    profiles: [
-      {
-        id: "5",
-        name: "David Kim",
-        username: "davidk",
-        profilePicture:
-          "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=100&h=100&fit=crop&crop=face",
-        isOnline: false,
-      },
-    ],
-  },
-  {
-    id: "tokyo",
-    name: "Tokyo",
-    country: "Japan",
-    coordinates: { x: 80, y: 30 },
-    profiles: [
-      {
-        id: "6",
-        name: "Lisa Park",
-        username: "lisap",
-        profilePicture:
-          "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop&crop=face",
-        isOnline: true,
-      },
-      {
-        id: "7",
-        name: "Hiroshi Tanaka",
-        username: "hiroshi",
-        profilePicture:
-          "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop&crop=face",
-        isOnline: true,
-      },
-    ],
-  },
-  {
-    id: "sydney",
-    name: "Sydney",
-    country: "Australia",
-    coordinates: { x: 85, y: 70 },
-    profiles: [
-      {
-        id: "8",
-        name: "Olivia Brown",
-        username: "oliviab",
-        profilePicture:
-          "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=100&h=100&fit=crop&crop=face",
-        isOnline: false,
-      },
-    ],
-  },
-  {
-    id: "berlin",
-    name: "Berlin",
-    country: "Germany",
-    coordinates: { x: 52, y: 28 },
-    profiles: [
-      {
-        id: "9",
-        name: "Max Mueller",
-        username: "maxm",
-        profilePicture:
-          "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop&crop=face",
-        isOnline: true,
-      },
-    ],
-  },
+interface Profile {
+  id: string;
+  name: string;
+  username: string;
+  profilePicture: string;
+  isOnline: boolean;
+  worldId: string;
+  worldAddress: string;
+  notes: string;
+}
+
+interface LocationData {
+  id: string;
+  name: string;
+  country: string;
+  coordinates: { x: number; y: number };
+  profiles: Profile[];
+}
+
+// Predefined locations for assignment
+const AVAILABLE_LOCATIONS = [
+  { id: "sf", name: "San Francisco", country: "USA", coordinates: { x: 15, y: 35 } },
+  { id: "ny", name: "New York", country: "USA", coordinates: { x: 25, y: 30 } },
+  { id: "london", name: "London", country: "UK", coordinates: { x: 50, y: 25 } },
+  { id: "tokyo", name: "Tokyo", country: "Japan", coordinates: { x: 80, y: 30 } },
+  { id: "sydney", name: "Sydney", country: "Australia", coordinates: { x: 85, y: 70 } },
+  { id: "berlin", name: "Berlin", country: "Germany", coordinates: { x: 52, y: 28 } },
+  { id: "toronto", name: "Toronto", country: "Canada", coordinates: { x: 22, y: 32 } },
+  { id: "mumbai", name: "Mumbai", country: "India", coordinates: { x: 70, y: 45 } },
+  { id: "singapore", name: "Singapore", country: "Singapore", coordinates: { x: 75, y: 55 } },
+  { id: "saopaulo", name: "São Paulo", country: "Brazil", coordinates: { x: 30, y: 65 } },
 ];
 
+// Function to assign location based on worldId (deterministic)
+const assignLocationToConnection = (connection: Connection, index: number) => {
+  // Use worldId hash to deterministically assign location
+  const hash = connection.worldId.split('').reduce((a, b) => {
+    a = ((a << 5) - a) + b.charCodeAt(0);
+    return a & a;
+  }, 0);
+  const locationIndex = Math.abs(hash) % AVAILABLE_LOCATIONS.length;
+  return AVAILABLE_LOCATIONS[locationIndex];
+};
+
+// Transform connections into location data
+const transformConnectionsToLocations = (connections: Connection[]): LocationData[] => {
+  const locationMap = new Map<string, LocationData>();
+
+  connections.forEach((connection, index) => {
+    const assignedLocation = assignLocationToConnection(connection, index);
+    
+    const profile: Profile = {
+      id: connection.id,
+      name: connection.worldId || `User ${connection.id}`,
+      username: connection.worldId.toLowerCase() || `user${connection.id}`,
+      profilePicture: `https://images.unsplash.com/photo-${1472099645785 + parseInt(connection.id.slice(-3)) || 1}?w=100&h=100&fit=crop&crop=face`,
+      isOnline: Math.random() > 0.3, // Random online status for demo
+      worldId: connection.worldId,
+      worldAddress: connection.worldAddress,
+      notes: connection.notes,
+    };
+
+    if (locationMap.has(assignedLocation.id)) {
+      locationMap.get(assignedLocation.id)!.profiles.push(profile);
+    } else {
+      locationMap.set(assignedLocation.id, {
+        ...assignedLocation,
+        profiles: [profile],
+      });
+    }
+  });
+
+  return Array.from(locationMap.values());
+};
+
+
 export default function WorldCircles() {
+  const [connections, setConnections] = useState<Connection[]>([]);
+  const [locationData, setLocationData] = useState<LocationData[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  const loadConnections = () => {
+    try {
+      const storedConnections = getConnections();
+      setConnections(storedConnections);
+      
+      if (storedConnections.length > 0) {
+        const transformedData = transformConnectionsToLocations(storedConnections);
+        setLocationData(transformedData);
+      } else {
+        setLocationData([]);
+      }
+    } catch (error) {
+      console.error("Failed to load connections:", error);
+      setLocationData([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadConnections();
+
+    // Refresh when page becomes visible
+    const handleFocus = () => {
+      loadConnections();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
+
   return (
     <>
       <Page.Header className="p-0">
@@ -143,10 +135,43 @@ export default function WorldCircles() {
             <p className="text-gray-600">
               Connect with people around the globe
             </p>
+            {connections.length > 0 && (
+              <p className="text-sm text-blue-600 mt-2">
+                {connections.length} connection{connections.length !== 1 ? 's' : ''} across {locationData.length} location{locationData.length !== 1 ? 's' : ''}
+              </p>
+            )}
           </div>
 
-          {/* Globe Container */}
-          <div className="relative bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 mb-6">
+          {/* Loading State */}
+          {isLoading && (
+            <div className="text-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="text-gray-600 mt-2">Loading connections...</p>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!isLoading && connections.length === 0 && (
+            <div className="text-center py-12">
+              <div className="w-24 h-24 bg-gray-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-800 mb-2">No Connections Yet</h2>
+              <p className="text-gray-600 mb-4">Start connecting with people to see them on the world map!</p>
+              <p className="text-sm text-gray-500">
+                Use the QR scanner or share your profile link to add connections.
+              </p>
+            </div>
+          )}
+
+          {/* Globe Visualization - Only show if we have connections */}
+          {!isLoading && locationData.length > 0 && (
+            <>
+              {/* Globe Container */}
+              <div className="relative bg-gradient-to-br from-blue-50 to-indigo-100 rounded-2xl p-8 mb-6">
             <div className="relative w-full h-80 bg-gradient-to-br from-blue-400 to-blue-600 rounded-full shadow-2xl overflow-hidden">
               {/* Globe Background Pattern */}
               <div className="absolute inset-0 opacity-20">
@@ -228,9 +253,16 @@ export default function WorldCircles() {
                             alt={profile.name}
                             className="w-6 h-6 rounded-full object-cover"
                           />
-                          <span className="text-xs font-medium">
-                            {profile.name}
-                          </span>
+                          <div className="flex-1">
+                            <span className="text-xs font-medium block">
+                              {profile.name}
+                            </span>
+                            {profile.notes && (
+                              <span className="text-xs text-gray-500 truncate block">
+                                {profile.notes}
+                              </span>
+                            )}
+                          </div>
                           <div
                             className={`w-2 h-2 rounded-full ${
                               profile.isOnline ? "bg-green-500" : "bg-gray-400"
@@ -254,10 +286,9 @@ export default function WorldCircles() {
           <div className="space-y-4">
             <h2 className="text-lg font-semibold mb-4">All Locations</h2>
             {locationData.map((location) => (
-              <Link
+              <div
                 key={location.id}
-                href={`/profile/${location.profiles[0]?.id || "1"}`} // Link to first profile in location
-                className="block bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow"
+                className="block bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
@@ -294,9 +325,11 @@ export default function WorldCircles() {
                     <span className="text-gray-400">→</span>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
-          </div>
+              </div>
+            </>
+          )}
         </div>
       </Page.Main>
     </>
