@@ -57,7 +57,7 @@ export default function MyProfile({ session }: { session: Session }) {
       try {
         // Try to load from localStorage first
         // const savedProfile = localStorage.getItem("userProfile");
-        const [worldId, name, bio, location, company, isSelfVerified] =
+        const [_worldId, name, bio, location, company, _isSelfVerified] =
           await getPerson(session.user.walletAddress as `0x${string}`);
 
         setProfileData({ ...profileData, name, bio, company, location });
