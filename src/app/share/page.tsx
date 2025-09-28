@@ -3,13 +3,14 @@
 import { Page } from "@/components/PageLayout";
 import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 import { useSearchParams } from "next/navigation.js";
+import { useState } from "react";
 
 export default function AddCircle() {
-  const [showQR, setShowQR] = useState(false);
-  const [_, setReceivedId] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<
+    "idle" | "success" | "error"
+  >("idle");
   const searchParams = useSearchParams();
   const worldId = searchParams.get("worldId");
   const worldAddress = searchParams.get("worldAddress");
@@ -17,36 +18,35 @@ export default function AddCircle() {
   // Dummy smart contract call function
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    setSubmitStatus('idle');
-    
+    setSubmitStatus("idle");
+
     try {
       // Simulate smart contract call
       console.log("Calling smart contract with:", {
         worldId,
         worldAddress,
         notes,
-        action: "addConnection"
+        action: "addConnection",
       });
-      
+
       // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       // Simulate success
-      setSubmitStatus('success');
-      
+      setSubmitStatus("success");
+
       // Clear form after success
       setTimeout(() => {
         setNotes("");
-        setSubmitStatus('idle');
+        setSubmitStatus("idle");
       }, 3000);
-      
     } catch (error) {
       console.error("Smart contract call failed:", error);
-      setSubmitStatus('error');
-      
+      setSubmitStatus("error");
+
       // Reset error status after 3 seconds
       setTimeout(() => {
-        setSubmitStatus('idle');
+        setSubmitStatus("idle");
       }, 3000);
     } finally {
       setIsSubmitting(false);
@@ -69,8 +69,18 @@ export default function AddCircle() {
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
             <div className="flex items-center justify-center mb-4">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-6 h-6 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
             </div>
@@ -78,7 +88,8 @@ export default function AddCircle() {
               Successfully Connected!
             </h2>
             <p className="text-green-700 text-sm">
-              You're successfully connected with World ID: <span className="font-mono font-semibold">{worldId}</span>
+              You're successfully connected with World ID:{" "}
+              <span className="font-mono font-semibold">{worldId}</span>
             </p>
             <p className="text-green-600 text-xs mt-2">
               Address: {worldAddress}
@@ -91,7 +102,7 @@ export default function AddCircle() {
             <p className="text-gray-600 text-sm mb-4">
               Add some notes about this connection for future reference
             </p>
-            
+
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -99,7 +110,7 @@ export default function AddCircle() {
               className="w-full px-3 py-3 border border-gray-300 rounded-md resize-none"
               rows={4}
             />
-            
+
             <div className="mt-4 flex justify-between items-center">
               <span className="text-xs text-gray-500">
                 {notes.length} characters
@@ -109,21 +120,31 @@ export default function AddCircle() {
                 disabled={isSubmitting || !notes.trim()}
                 className={`px-6 py-2 rounded-md font-medium transition-colors ${
                   isSubmitting || !notes.trim()
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                    ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
                 }`}
               >
-                {isSubmitting ? 'Submitting...' : 'Submit Connection'}
+                {isSubmitting ? "Submitting..." : "Submit Connection"}
               </button>
             </div>
           </div>
 
           {/* Status Messages */}
-          {submitStatus === 'success' && (
+          {submitStatus === "success" && (
             <div className="bg-green-50 border border-green-200 rounded-lg p-4">
               <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="w-5 h-5 text-green-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
                 <p className="text-green-600 text-sm">
                   ✅ Connection successfully added to blockchain! Notes saved.
@@ -131,12 +152,22 @@ export default function AddCircle() {
               </div>
             </div>
           )}
-          
-          {submitStatus === 'error' && (
+
+          {submitStatus === "error" && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-center gap-3">
-                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                <svg
+                  className="w-5 h-5 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
                 <p className="text-red-600 text-sm">
                   ❌ Failed to add connection. Please try again.
@@ -173,7 +204,6 @@ export default function AddCircle() {
               </div>
             </div>
           </div>
-          
         </div>
       </Page.Main>
     </>
