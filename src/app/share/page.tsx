@@ -5,9 +5,53 @@ import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 import { useSearchParams } from "next/navigation.js";
 
 export default function AddCircle() {
+  const [showQR, setShowQR] = useState(false);
+  const [_, setReceivedId] = useState<string | null>(null);
+  const [notes, setNotes] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const searchParams = useSearchParams();
   const worldId = searchParams.get("worldId");
   const worldAddress = searchParams.get("worldAddress");
+
+  // Dummy smart contract call function
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    
+    try {
+      // Simulate smart contract call
+      console.log("Calling smart contract with:", {
+        worldId,
+        worldAddress,
+        notes,
+        action: "addConnection"
+      });
+      
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Simulate success
+      setSubmitStatus('success');
+      
+      // Clear form after success
+      setTimeout(() => {
+        setNotes("");
+        setSubmitStatus('idle');
+      }, 3000);
+      
+    } catch (error) {
+      console.error("Smart contract call failed:", error);
+      setSubmitStatus('error');
+      
+      // Reset error status after 3 seconds
+      setTimeout(() => {
+        setSubmitStatus('idle');
+      }, 3000);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (!worldId) {
     return <></>;
@@ -21,15 +65,85 @@ export default function AddCircle() {
 
       <Page.Main className="mb-16">
         <div className="px-4 py-6 space-y-6">
-          {/* Share Profile Section */}
-          <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold mb-2">{worldAddress}</h2>
-              <p className="text-gray-600 text-sm">
-                Let others add you to their circle by scanning your QR code
-              </p>
+          {/* Success Message */}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-center">
+            <div className="flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <h2 className="text-xl font-semibold text-green-800 mb-2">
+              Successfully Connected!
+            </h2>
+            <p className="text-green-700 text-sm">
+              You're successfully connected with World ID: <span className="font-mono font-semibold">{worldId}</span>
+            </p>
+            <p className="text-green-600 text-xs mt-2">
+              Address: {worldAddress}
+            </p>
+          </div>
+
+          {/* Notes Section */}
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-lg font-semibold mb-4">Add Notes</h3>
+            <p className="text-gray-600 text-sm mb-4">
+              Add some notes about this connection for future reference
+            </p>
+            
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder="Write your notes here... (e.g., 'Met at Tech Meetup 2024', 'Great developer, interested in Web3', etc.)"
+              className="w-full px-3 py-3 border border-gray-300 rounded-md resize-none"
+              rows={4}
+            />
+            
+            <div className="mt-4 flex justify-between items-center">
+              <span className="text-xs text-gray-500">
+                {notes.length} characters
+              </span>
+              <button
+                onClick={handleSubmit}
+                disabled={isSubmitting || !notes.trim()}
+                className={`px-6 py-2 rounded-md font-medium transition-colors ${
+                  isSubmitting || !notes.trim()
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
+                }`}
+              >
+                {isSubmitting ? 'Submitting...' : 'Submit Connection'}
+              </button>
             </div>
           </div>
+
+          {/* Status Messages */}
+          {submitStatus === 'success' && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <p className="text-green-600 text-sm">
+                  ✅ Connection successfully added to blockchain! Notes saved.
+                </p>
+              </div>
+            </div>
+          )}
+          
+          {submitStatus === 'error' && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="flex items-center gap-3">
+                <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <p className="text-red-600 text-sm">
+                  ❌ Failed to add connection. Please try again.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Additional Info */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -49,16 +163,17 @@ export default function AddCircle() {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-blue-800">
-                  How it works
+                  Connection Details
                 </h3>
                 <ul className="text-sm text-blue-700 mt-1 space-y-1">
-                  <li>• Your QR code is unique and fixed to your profile</li>
-                  <li>• Others scan it to add you to their circle</li>
-                  <li>• You can share the link directly or show the QR code</li>
+                  <li>• This connection is stored on the blockchain</li>
+                  <li>• Your notes are saved locally for your reference</li>
+                  <li>• You can view this connection in your profile</li>
                 </ul>
               </div>
             </div>
           </div>
+          
         </div>
       </Page.Main>
     </>
