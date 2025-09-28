@@ -1,33 +1,13 @@
+"use client";
+
 import { Page } from "@/components/PageLayout";
 import { TopBar, Marble } from "@worldcoin/mini-apps-ui-kit-react";
-import { auth } from "@/auth";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { Event } from "@/types/event";
 
-// Dummy event data
-const yourEvents = [
-  {
-    id: 1,
-    name: "Tech Meetup 2024",
-    date: "2024-02-15",
-    location: "San Francisco, CA",
-    type: "upcoming",
-  },
-  {
-    id: 2,
-    name: "Design Workshop",
-    date: "2024-02-20",
-    location: "New York, NY",
-    type: "upcoming",
-  },
-  {
-    id: 3,
-    name: "Blockchain Conference",
-    date: "2024-01-30",
-    location: "Austin, TX",
-    type: "past",
-  },
-];
-
+// Dummy explore events (keeping these for demo)
 const exploreEvents = [
   {
     id: 4,
@@ -61,8 +41,40 @@ const exploreEvents = [
   },
 ];
 
-export default async function Home() {
-  const session = await auth();
+export default function Home() {
+  const { data: session } = useSession();
+  const [yourEvents, setYourEvents] = useState<Event[]>([]);
+
+  const loadEvents = () => {
+    // Load events from localStorage
+    const storedEvents = localStorage.getItem("events");
+    if (storedEvents) {
+      try {
+        const events = JSON.parse(storedEvents);
+        setYourEvents(events);
+      } catch (error) {
+        console.error("Error parsing events from localStorage:", error);
+        setYourEvents([]);
+      }
+    } else {
+      setYourEvents([]);
+    }
+  };
+
+  useEffect(() => {
+    loadEvents();
+
+    // Refresh events when the page becomes visible again
+    const handleFocus = () => {
+      loadEvents();
+    };
+
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
 
   return (
     <>
@@ -92,28 +104,51 @@ export default async function Home() {
             </Link>
           </div>
           <div className="flex gap-4 overflow-x-auto pb-2">
-            {yourEvents.map((event) => (
-              <Link
-                key={event.id}
-                href={`/event/${event.id}`}
-                className="flex-shrink-0 w-64 bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-semibold text-sm">{event.name}</h3>
-                  <span
-                    className={`text-xs px-2 py-1 rounded-full ${
-                      event.type === "upcoming"
-                        ? "bg-green-100 text-green-800"
-                        : "bg-gray-100 text-gray-800"
-                    }`}
+            {yourEvents.length === 0 ? (
+              <div className="w-full text-center py-8 text-gray-500">
+                <p>No events created yet</p>
+                <p className="text-sm">
+                  Click &quot;Create Event&quot; to get started!
+                </p>
+              </div>
+            ) : (
+              yourEvents.map((event) => {
+                // Determine if event is upcoming or past
+                const eventDate = new Date(event.date);
+                const today = new Date();
+                const isUpcoming = eventDate >= today;
+
+                return (
+                  <Link
+                    key={event.id}
+                    href={`/event/${event.id}`}
+                    className="flex-shrink-0 w-64 bg-white rounded-lg shadow-sm border p-4 hover:shadow-md transition-shadow cursor-pointer"
                   >
-                    {event.type === "upcoming" ? "Upcoming" : "Past"}
-                  </span>
-                </div>
-                <p className="text-gray-600 text-sm mb-1">📅 {event.date}</p>
-                <p className="text-gray-600 text-sm">📍 {event.location}</p>
-              </Link>
-            ))}
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="font-semibold text-sm">{event.name}</h3>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${
+                          isUpcoming
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {isUpcoming ? "Upcoming" : "Past"}
+                      </span>
+                    </div>
+                    <p className="text-gray-600 text-sm mb-1">
+                      📅 {event.date}
+                    </p>
+                    <p className="text-gray-600 text-sm mb-1">
+                      📍 {event.venue}
+                    </p>
+                    <p className="text-gray-600 text-xs truncate">
+                      {event.about}
+                    </p>
+                  </Link>
+                );
+              })
+            )}
           </div>
         </div>
 

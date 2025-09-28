@@ -2,13 +2,15 @@
 
 import { Page } from "@/components/PageLayout";
 import { TopBar, Button, Input } from "@worldcoin/mini-apps-ui-kit-react";
-import { useWorldTx } from "@/hooks/useWorldTx";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Event } from "@/types/event";
 
 export default function CreateEvent() {
-  const { sendTx, status } = useWorldTx();
   const router = useRouter();
+  const [status, setStatus] = useState<
+    "idle" | "pending" | "success" | "failed"
+  >("idle");
 
   const [formData, setFormData] = useState({
     name: "",
@@ -37,15 +39,36 @@ export default function CreateEvent() {
       return;
     }
 
+    setStatus("pending");
+
     try {
-      await sendTx("createEvent", [
-        formData.name,
-        formData.about,
-        formData.date,
-        formData.venue,
-      ]);
+      // Get existing events from localStorage
+      const existingEvents = JSON.parse(localStorage.getItem("events") || "[]");
+
+      // Create new event
+      const newEvent: Event = {
+        id: Date.now().toString(),
+        name: formData.name,
+        about: formData.about,
+        date: formData.date,
+        venue: formData.venue,
+        creator: "current-user", // In a real app, this would be the user's address
+        createdAt: new Date().toISOString(),
+      };
+
+      // Add to existing events
+      const updatedEvents = [...existingEvents, newEvent];
+
+      // Save back to localStorage
+      localStorage.setItem("events", JSON.stringify(updatedEvents));
+
+      // Simulate network delay for better UX
+      setTimeout(() => {
+        setStatus("success");
+      }, 1000);
     } catch (error) {
       console.error("Error creating event:", error);
+      setStatus("failed");
     }
   };
 
