@@ -55,19 +55,23 @@ export default function MyProfile({ session }: { session: Session }) {
   useEffect(() => {
     const loadProfile = async () => {
       try {
-        // Try to load from localStorage first
-        // const savedProfile = localStorage.getItem("userProfile");
         const [_worldId, name, bio, location, company, _isSelfVerified] =
           await getPerson(session.user.walletAddress as `0x${string}`);
 
-        setProfileData({ ...profileData, name, bio, company, location });
+        setProfileData((prev) => ({
+          ...prev,
+          name,
+          bio,
+          company,
+          location,
+        }));
       } catch (error) {
         console.error("Error loading profile:", error);
       }
     };
 
     loadProfile();
-  }, [profileData, session.user.walletAddress]);
+  }, [session.user.walletAddress]);
 
   const handleSaveProfile = async () => {
     if (!session?.user.id) return;

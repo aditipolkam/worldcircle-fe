@@ -10,7 +10,7 @@ import {
 // Reuse a single verifier instance
 const selfBackendVerifier = new SelfBackendVerifier(
   "self-docs",
-  "https://recently-moral-anemone.ngrok-free.app/api/verify",
+  `${process.env.AUTH_URL}/api/verify`,
   true, // mockPassport: false = mainnet, true = staging/testnet
   AllIds,
   new DefaultConfigStore({
