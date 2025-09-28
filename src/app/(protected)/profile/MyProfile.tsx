@@ -6,6 +6,7 @@ import { getPerson } from "@/lib/read";
 import { Marble, TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 import { Session } from "next-auth";
 import { useEffect, useState } from "react";
+import SelfAuthButton from "@/components/SelfAuthButton";
 
 interface ProfileData {
   name: string;
@@ -363,6 +364,14 @@ export default function MyProfile({ session }: { session: Session }) {
               <button className="w-full bg-white border border-gray-300 text-gray-700 py-3 px-4 rounded-md font-medium hover:bg-gray-50 transition-colors">
                 Share My Profile
               </button>
+              <div className="w-full bg-white border border-gray-300 rounded-md p-3">
+                <div className="text-center">
+                  <p className="text-sm font-medium text-gray-700 mb-2">
+                    Verify Your Identity
+                  </p>
+                  <SelfAuthButton />
+                </div>
+              </div>
             </div>
           )}
         </div>
