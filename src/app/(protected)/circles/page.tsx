@@ -327,7 +327,7 @@ export default function WorldCircles() {
                               />
                               <div className="flex-1">
                                 <span className="text-xs font-medium block">
-                                  {profile.name}
+                                  {profile.username}
                                 </span>
                                 {profile.notes && (
                                   <span className="text-xs text-gray-500 truncate block">
@@ -357,7 +357,7 @@ export default function WorldCircles() {
               </div>
 
               {/* Location List */}
-              <div className="space-y-4">
+              {/* <div className="space-y-4">
                 <h2 className="text-lg font-semibold mb-4">All Locations</h2>
                 {locationData.map((location) => (
                   <div
@@ -401,7 +401,7 @@ export default function WorldCircles() {
                     </div>
                   </div>
                 ))}
-              </div>
+              </div> */}
             </>
           )}
         </div>
