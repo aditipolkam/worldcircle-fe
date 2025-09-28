@@ -82,7 +82,15 @@ export default async function Home() {
       <Page.Main className="flex flex-col gap-6 mb-16">
         {/* Your Events Section */}
         <div className="px-4">
-          <h2 className="text-xl font-semibold mb-4">Your Events</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Your Events</h2>
+            <Link
+              href="/create-event"
+              className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+            >
+              + Create Event
+            </Link>
+          </div>
           <div className="flex gap-4 overflow-x-auto pb-2">
             {yourEvents.map((event) => (
               <Link
