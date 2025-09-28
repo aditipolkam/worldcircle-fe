@@ -2,18 +2,9 @@
 
 import { Page } from "@/components/PageLayout";
 import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
-import dynamic from "next/dynamic";
 import { useSearchParams } from "next/navigation.js";
-import { useState } from "react";
-
-const QrReader = dynamic(
-  () => import("react-qr-reader").then((mod) => mod.QrReader), // <-- use named export
-  { ssr: false }
-);
 
 export default function AddCircle() {
-  const [showQR, setShowQR] = useState(false);
-  const [_, setReceivedId] = useState<string | null>(null);
   const searchParams = useSearchParams();
   const worldId = searchParams.get("worldId");
   const worldAddress = searchParams.get("worldAddress");
