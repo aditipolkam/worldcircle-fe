@@ -5,7 +5,13 @@ import { TopBar } from "@worldcoin/mini-apps-ui-kit-react";
 import { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 
-export default function QrCode({ worldId }: { worldId: string }) {
+export default function QrCode({
+  worldId,
+  worldAddress,
+}: {
+  worldId: string;
+  worldAddress: string;
+}) {
   const [receivedId, setReceivedId] = useState<string | null>(null);
   const [nfcSupported, setNfcSupported] = useState(false);
 
@@ -127,11 +133,14 @@ export default function QrCode({ worldId }: { worldId: string }) {
 
                   {/* QR Code */}
                   <QRCodeSVG
-                    value={
-                      process.env.NEXT_PUBLIC_AUTH_URL +
+                    value={`worldapp://mini-app?app_id=${
+                      process.env.NEXT_PUBLIC_APP_ID
+                    }&path=${encodeURI(
                       "/share?worldId=" +
-                      worldId
-                    }
+                        worldId +
+                        "&worldAddress=" +
+                        worldAddress
+                    )}`}
                     size={200}
                   />
 

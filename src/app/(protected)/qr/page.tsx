@@ -5,7 +5,10 @@ export default async function QrPage() {
   const session = await auth();
 
   return session?.user.username ? (
-    <QrCode worldId={session?.user.username} />
+    <QrCode
+      worldId={session?.user.username}
+      worldAddress={session.user.walletAddress}
+    />
   ) : (
     <>no qr</>
   );
